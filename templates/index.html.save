@@ -1,0 +1,5 @@
+<!DOCTYPE html>
+<h1>Your Posts:</h1>
+<a href="/prod">Create a new post!</a>
+{% for post in g.posts %}
+	<h2>{{ 

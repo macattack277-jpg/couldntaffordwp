@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+	{% for message in messages %}
+		{{message}}
+	{% endfor %}
+{% endif %}
+{% endwith %}
+<head>
+</head>
+
+
+<body>
+	<form method="POST">
+		<input type="text" name="title" placeholder="Title" required>
+		<br>
+		<input type="text" name="content" placeholder="Lorem ipsum">
+		<br>
+		<input type="submit">
+	</form>
+</body>
+
+
+
+</html>
