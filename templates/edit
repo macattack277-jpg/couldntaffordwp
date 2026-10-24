@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<h1>Edit Post</h1>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+	{% for message in messages %}
+		{{message}}
+	{% endfor %}
+{% endif %}
+{% endwith %}
+<head>
+</head>
+
+
+<body>
+	<form method="POST">
+		<input type="text" name="title" placeholder="Title" value="{{ g.title }}" required>
+		<br>
+		<input type="text" name="content" placeholder="Lorem ipsum" value="{{ g.content }}">
+		<br>
+		<input type="submit">
+	</form>
+
+	<br>
+	<a href='/delete/posts/{{ g.title  }}'>Delete this post</a>
+</body>
+
+
+
+
+</html>
