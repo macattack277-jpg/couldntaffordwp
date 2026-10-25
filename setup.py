@@ -6,7 +6,7 @@ from sys import exit
 import bcrypt
 import secrets
 
-# This was made partly with AI because I originally wrote it trying to use a different method for setting the .env variables but it didn't work so I couldn't be bothered changing that part by hand
+# Made this partly with AI because I had to fix a bunch of stuff and cbf rewriting by hand
 
 env_path = Path('.env')
 
@@ -15,32 +15,38 @@ if env_path.exists():
     if action.lower() != 'y':
         exit()
 
-# Create / clear the .env file
+# Create a fresh .env file
 env_path.write_text('# .env\n')
 
-# Optional: load it (not really needed here since the file is empty)
 load_dotenv(dotenv_path=env_path, override=True)
 
-print('Welcome to the Couldntaffordwp setup wizard! In the current version, you must change the .env variables directly if you wish to update any of these details.')
+print('Welcome to the Couldntaffordwp setup wizard!')
+print('In the current version, you must change the .env variables directly if you wish to update any of these details.\n')
 
 public_name = input('Enter your public name (showed on your profile): ')
 username = input('Enter your private name (used to log you in): ')
 
 while True:
     password = getpass(prompt='Enter your password: ').encode('utf-8')
-    passwordconfirm = getpass(prompt='Enter your password: ').encode('utf-8')
-    if password == passwordconfirm:
+    password_confirm = getpass(prompt='Confirm your password: ').encode('utf-8')
+    
+    if password == password_confirm:
         break
-    print('Passwords did not match!')
+    print('Passwords did not match! Try again.\n')
 
+# Generate salt + hash
 salt = bcrypt.gensalt()
-password_hash = str(bcrypt.hashpw(password, salt))
+hashed = bcrypt.hashpw(password, salt)
+
+# Important: decode the bytes so we store a clean string like $2b$12$...
+hashed_str = hashed.decode('utf-8')
+
 secret_key = secrets.token_hex(32)
 
-# Actually write the values into the .env file
+# Write everything cleanly into the .env file
 set_key(env_path, 'PUBLIC_NAME', public_name)
 set_key(env_path, 'USERNAME', username)
-set_key(env_path, 'HASH', password_hash)
+set_key(env_path, 'HASH', hashed_str)
 set_key(env_path, 'SECRET_KEY', secret_key)
 
-print('Done! Credentials written to .env')
+print('\nDone! Credentials have been written to .env')
