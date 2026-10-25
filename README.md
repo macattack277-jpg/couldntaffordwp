@@ -29,6 +29,12 @@ CAWP comes with a setup script that enters your details (including hashed/salted
 
 Note that if you use this script with a .env file already present it will overwrite any existing data. Upon using the script, you will also be given a custom session key to be used when you log in.
 
+# Starting the server
+
+app.py is the executable that actually runs the server. To use it in test mode (not in prod):
+
+`flask --app app.py run`
+
 # Logging into the application remotely
 
 CAWP comes with a login page, /login. Once you have started the Flask server, Enter the private username/password combination on that screen to start a session. You will be able to create and edit posts.
