@@ -14,9 +14,9 @@ import bcrypt
 from shutil import rmtree
 
 # Initialize
+load_dotenv(dotenv_path='.env', override='True')
 app = Flask(__name__)
 app.secret_key = getenv('SECRET_KEY')
-load_dotenv(dotenv_path='.env', override='True')
 POSTS_DIR = Path('posts').resolve()
 
 def check_session():
