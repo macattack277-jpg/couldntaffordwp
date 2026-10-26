@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+	<title>{{ g.public_name }}'s Page</title>
+</head>
+
+
+<body>
+	{% for message in get_flashed_messages() %}
+		{{ message }}
+	{% endfor %}
+
+
+
+	<h1>{{ g.public_name }}'s Posts</h1>
+
+		{% if g.loggedin %}
+			<a href='./logout'>Log out<br><a href='./prod'>Create Post</a>
+		{% endif %}
+
+
+		{% for post, content in g.postdict.items() %}
+			<br>
+			<br>
+
+			<h2>{{ post }}</h2>
+
+			<a><small>Created: {{ content[1] }} {{ content[2] }}</small><br></a>
+
+			<p> {{ content[0] }} </p>
+
+			{% if g.loggedin %}
+				 <br><a href='edit/posts/{{ post }} '>Edit</a> 
+			{% endif %}
+			
+			<br>
+
+		{% endfor %}
+</body>
+
+
+
+
+
+
+</html>

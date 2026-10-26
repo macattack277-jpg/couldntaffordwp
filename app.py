@@ -88,19 +88,16 @@ def post():
 # Then realised later on that templates would've been way better, however I didn't prioritise this over making other features
 @app.route('/')
 def view_posts():
+	g.public_name = getenv('PUBLIC_NAME')
 	if 'username' in session and session['username'] == getenv('USERNAME'):
-		extrainfo = '<a href="./logout">Log out</a><br><a href="./prod">Create a new post!</a>'
+		g.loggedin = True
 	else:
-		extrainfo = ''
-	messages = ''
-	if get_flashed_messages():
-		for message in get_flashed_messages():
-			messages += f'{message}<br>'
-	data = f'<h1>{getenv("PUBLIC_NAME")}\'s posts:</h1>{extrainfo}<br>{messages}'
+		g.loggedin = False
 	path = Path('posts')
 	posts = [post for post in path.iterdir()]
 	posts.sort(key=lambda f: f.stat().st_ctime)
 	posts.reverse()
+	g.postdict = {}
 	for post in posts:
 		with open(f'{post}/created', 'r') as file:
 			created = file.read()
@@ -109,13 +106,10 @@ def view_posts():
 				edited = '<br>Last edited: ' + file.read()
 		except FileNotFoundError:
 			edited = ''
-		if 'username' in session and session['username'] == getenv('USERNAME'):
-			edit = f'<br><a href="edit/{post}">Edit</a>'
-		else:
-			edit = ''
 		with open(f'{post}/content', 'r') as file:
-			data += f'<br><br><h2>{str(post).replace("posts/", "")}</h2><a><small>Created: {created}{edited}</small><br></a><p>{file.read()}</p>{edit}<br>'
-	return data
+			file = file.read()
+		g.postdict[str(post).replace('posts/', '')] = [file, created, edited]
+	return render_template('index')
 
 
 
@@ -140,15 +134,15 @@ def initedit(post):
 @app.post('/edit/<path:post>')
 def postedit(post):
 	check_session()
-	content = escape(request.form)
-	directory = escape(request.form['title'])
+	content = request.form
+	directory = request.form['title']
 	post_path = Path(post).resolve()
 	if not post_path.is_relative_to(POSTS_DIR):
 		abort(400)
 	old_directory = Path(f'posts/{session["title"]}')
 	del session['title']
 	with open(f'{old_directory}/content', 'w') as file:
-		file.write(escape(request.form['content']))
+		file.write(request.form['content'])
 	old_directory.rename(f'posts/{directory}')
 	with open(f'posts/{directory}/edited', 'w') as file:
 		file.write(f'{datetime.now().replace(microsecond=0)}')

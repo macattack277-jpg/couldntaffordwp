@@ -13,9 +13,9 @@
 
 <body>
 	<form method="POST">
-		<input type="text" name="title" placeholder="Title" value="{{ g.title }}" required>
+		<textarea name="title" rows=1 cols=100>{{ g.title }}</textarea>
 		<br>
-		<input type="text" name="content" placeholder="Lorem ipsum" value="{{ g.content }}">
+		<textarea name="content" rows=30 cols=100>{{ g.content }}</textarea>
 		<br>
 		<input type="submit">
 	</form>
