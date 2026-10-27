@@ -1,6 +1,8 @@
 # Flask modules
 from flask import Flask, request, flash, session, render_template, redirect, g, abort, get_flashed_messages
-
+from flask_limiter.util import get_remote_address
+from flask_limiter import Limiter
+from flask_wtf.csrf import CSRFProtect
 
 # Other modules
 from markupsafe import escape
@@ -16,7 +18,13 @@ from shutil import rmtree
 # Initialize
 load_dotenv(dotenv_path='.env', override='True')
 app = Flask(__name__)
+limiter = Limiter(
+	get_remote_address,
+	app=app,
+	storage_uri='memory://',
+)
 app.secret_key = getenv('SECRET_KEY')
+csrf = CSRFProtect(app)
 POSTS_DIR = Path('posts').resolve()
 
 def check_session():
@@ -34,6 +42,7 @@ def getlogin():
 
 # Processor for the login
 @app.post('/login')
+@limiter.limit('100/day;10/hour;5/minute')
 def postlogin():
 	password = escape(request.form['password'])
 	name = escape(request.form['username'])
@@ -66,14 +75,15 @@ def init():
 def post():
 	check_session()
 
-	directory = escape(request.form['title'])
+	dir = request.form['title']
 	# check for skids thinking they're Mr Robot bluds
 
 
-	directory = (f'posts/{directory}')
+	directory = (f'posts/{dir}')
 	post_path = Path(directory).resolve()
-	if not post_path.is_relative_to(POSTS_DIR):
+	if not post_path.is_relative_to(POSTS_DIR) or any(char in dir for char in ('.', '/')):
 		abort(400)
+
 
 	newdirectory = Path(directory)
 	newdirectory.mkdir(parents=True, exist_ok=True)
@@ -84,8 +94,6 @@ def post():
 	return('Your post has been posted! You can view it <a href="../">Here</a>')
 
 # This is where the user's blog posts will appear
-# If you're reading this, I understand you probably find the elif statements instead of just using a template ridiculous, I originally implemented it this way
-# Then realised later on that templates would've been way better, however I didn't prioritise this over making other features
 @app.route('/')
 def view_posts():
 	g.public_name = getenv('PUBLIC_NAME')
@@ -137,7 +145,7 @@ def postedit(post):
 	content = request.form
 	directory = request.form['title']
 	post_path = Path(post).resolve()
-	if not post_path.is_relative_to(POSTS_DIR):
+	if not post_path.is_relative_to(POSTS_DIR) or any(char in directory for char in ('.', '/')):
 		abort(400)
 	old_directory = Path(f'posts/{session["title"]}')
 	del session['title']
@@ -175,3 +183,7 @@ def logout():
 	del session['username']
 	flash('Successfully logged out!')
 	return redirect('/')
+
+@app.errorhandler(429)
+def ratelimit(error):
+	abort(400)

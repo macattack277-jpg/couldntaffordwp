@@ -13,6 +13,7 @@
 
 <body>
 	<form method="POST">
+		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 		<textarea name="title" rows=1 cols=100>{{ g.title }}</textarea>
 		<br>
 		<textarea name="content" rows=30 cols=100>{{ g.content }}</textarea>
