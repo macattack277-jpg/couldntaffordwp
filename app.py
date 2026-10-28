@@ -3,6 +3,7 @@ from flask import Flask, request, flash, session, render_template, redirect, g, 
 from flask_limiter.util import get_remote_address
 from flask_limiter import Limiter
 from flask_wtf.csrf import CSRFProtect
+from flask_talisman import Talisman
 
 # Other modules
 from markupsafe import escape
@@ -23,6 +24,14 @@ limiter = Limiter(
 	app=app,
 	storage_uri='memory://',
 )
+csp = {'default-src': '\'self\'',
+	'script-src': '\'self\'',
+	'style-src': '\'self\'',
+	'form-action': '\'self\''}
+
+talisman = Talisman(app, content_security_policy=csp, force_https = False, frame_options='SAMEORIGIN')
+
+
 app.secret_key = getenv('SECRET_KEY')
 csrf = CSRFProtect(app)
 POSTS_DIR = Path('posts').resolve()
