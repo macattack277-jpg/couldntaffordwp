@@ -17,7 +17,7 @@
 	<h1>{{ g.public_name }}'s Posts</h1>
 
 		{% if g.loggedin %}
-			<a href='./logout'>Log out<br><a href='./prod'>Create Post</a>
+			<a href='./admin'>Admin panel</a><br><a href='./logout'>Log out<br><a href='./prod'>Create Post</a>
 		{% endif %}
 
 

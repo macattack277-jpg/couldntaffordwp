@@ -12,7 +12,7 @@ from pathlib import Path
 import secrets
 from datetime import datetime
 from os import getenv
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 import bcrypt
 from shutil import rmtree
 
@@ -193,6 +193,73 @@ def logout():
 	flash('Successfully logged out!')
 	return redirect('/')
 
+
 @app.errorhandler(429)
 def ratelimit(error):
 	abort(400)
+
+@app.get('/admin')
+def initaccount():
+	check_session()
+	g.public_name = getenv('PUBLIC_NAME')
+	g.private_name = getenv('USERNAME')
+	return render_template('admin')
+
+@app.post('/admin')
+def update_public_name():
+	check_session()
+	set_key('.env', 'PUBLIC_NAME', request.form['publicnameupdate'])
+	load_dotenv('.env', override=True)
+	flash('Changes saved!')
+	return redirect('/admin')
+
+@app.get('/updatecredentials')
+def update_creds():
+	check_session()
+	g.login_name = getenv('USERNAME')
+	return render_template('updatecredscreen')
+
+@app.get('/updatecredentials/name')
+def get_update_name():
+	check_session()
+	g.updating = 'username'
+	return render_template('updatecreds')
+
+@app.get('/updatecredentials/password')
+def get_update_password():
+        check_session()
+        g.updating = 'password'
+        return render_template('updatecreds')
+
+# I should probably make these two functions a singular function later to make the code more simple
+@limiter.limit('100/day;10/hour;5/minute')
+@app.post('/updatecredentials/name')
+def update_name():
+	check_session()
+	if bcrypt.checkpw(request.form['passwordverify'].encode('utf-8'), getenv('HASH').encode('utf-8')):
+		set_key('.env', 'USERNAME', request.form['name'])
+		load_dotenv('.env', override=True)
+		flash('Your name was updated!')
+		return redirect('/updatecredentials/name')
+	else:
+		flash('Your password was incorrect!')
+		return redirect('/updatecredentials/name')
+
+
+@limiter.limit('100/day;10/hour;5/minute')
+@app.post('/updatecredentials/password')
+def update_password():
+	check_session()
+	print(request.form['passwordverify'])
+	if request.form['newpassword'] != request.form['newpasswordconfirm']:
+		flash('Passwords did not match!')
+		return redirect('/updatecredentials/password')
+
+	if bcrypt.checkpw(request.form['passwordverify'].encode('utf-8'), getenv('HASH').encode('utf-8')):
+		set_key('.env', 'HASH', str(bcrypt.hashpw(request.form['newpassword'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')))
+		load_dotenv('.env', override=True)
+		flash('Your password has been successfully updated!')
+		return redirect('/updatecredentials/password')
+	else:
+		flash('Your password was incorrect!')
+		return redirect('/updatecredentials/password')

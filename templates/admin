@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<title>Admin Panel</title>
+</head>
+
+<body>
+
+<h1>Your Page Details</h1>
+
+{% for message in get_flashed_messages() %}
+	{{ message }}
+{% endfor %}
+
+<h3>Account details</h3>
+
+
+<form method='POST'>
+
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+<label for='publicnameupdate'>Public name:</label>
+<input value='{{ g.public_name }}' name='publicnameupdate' id='publicnameupdate' required>
+<input type=submit value='Update'>
+
+</form>
+
+<br>
+
+<a href='updatecredentials'>Update private details</a>
+<br>
+<a href='/'>Back home</a>
+
+
+</body>
+
+</html>

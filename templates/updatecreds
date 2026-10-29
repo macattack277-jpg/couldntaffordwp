@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Update {{ g.updating }}</title>
+</head>
+
+<body>
+
+	<h1>Update your {{ g.updating }}</h1>
+
+	{% for message in get_flashed_messages() %}
+		{{ message }}
+	{% endfor %}
+
+	{% if g.updating == 'username' %}
+		<form method='POST'>
+			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+			<label for='name'>Enter your new name:</label>
+			<input type='text' id='name' name='name' required>
+			<br>
+			<label for='passwordverify'>Enter your current password</label>
+			<input type='password' id='passwordverify' name='passwordverify' required>
+			<br>
+			<input type='submit' value='Update'>
+		</form>
+	{% elif g.updating == 'password' %}
+		<form method='POST'>
+			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+			<label for='newpassword'>Enter your new password:</label>
+			<input type='password' id='newpassword' name='newpassword' required>
+			<br>
+			<label for='newpasswordconfirm'>Re-enter your new password to confirm</label>
+			<input type='password' id='newpasswordconfirm' name='newpasswordconfirm' required>
+			<br>
+			<br>
+			<label for='passwordverify'>Enter your current password to confirm the change</label>
+			<input type='password' id='passwordverify' name='passwordverify' required>
+			<br>
+			<input type='submit' value='Update'>
+		</form>
+	{% endif %}
+	<br>
+	<a href='/admin'>Go back</a>
+			
+</body>
+
+</html>
