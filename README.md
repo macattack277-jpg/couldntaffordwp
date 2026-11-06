@@ -31,9 +31,13 @@ Note that if you use this script with a .env file already present it will overwr
 
 # Starting the server
 
-app.py is the executable that actually runs the server. To use it in test mode (not in prod):
+Couldntaffordwp now comes with WSGI deployability. This can then be used with a reverse proxy server such as Nginx safely in production. To start the application with gunicorn:
 
-`flask --app app.py run`
+`gunicorn --workers 3 --bind 127.0.0.1:8000 app:app`
+
+# Example: Reverse proxy with Nginx
+
+Read <a href='https://flask.palletsprojects.com/en/stable/deploying/nginx/'>this</a> to learn how to use Nginx as a reverse proxy server. I'll also add that in your 'sites-enabled' folder for Nginx you should create a symlink to the file for your blog in the 'sites-available' folder, and make sure there aren't any clashes with any other sites you might have enabled.
 
 # Logging into the application remotely
 
