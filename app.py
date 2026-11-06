@@ -41,6 +41,12 @@ app.secret_key = getenv('SECRET_KEY')
 csrf = CSRFProtect(app)
 POSTS_DIR = Path('posts').resolve()
 
+
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['REMEMBER_COOKIE_SECURE'] = True
+
+
 def check_session():
 	if 'username' in session:
 		if session['username'] != getenv('USERNAME'):
@@ -58,8 +64,8 @@ def getlogin():
 @app.post('/login')
 @limiter.limit('100/day;10/hour;5/minute')
 def postlogin():
-	password = escape(request.form['password'])
-	name = escape(request.form['username'])
+	password = (request.form['password']
+	name = request.form['username']
 	if name == getenv('USERNAME'):
 		if bcrypt.checkpw(password.encode('utf-8'), getenv('HASH').encode('utf-8')):
 			session['username'] = name
