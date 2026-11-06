@@ -64,7 +64,7 @@ def getlogin():
 @app.post('/login')
 @limiter.limit('100/day;10/hour;5/minute')
 def postlogin():
-	password = (request.form['password']
+	password = request.form['password']
 	name = request.form['username']
 	if name == getenv('USERNAME'):
 		if bcrypt.checkpw(password.encode('utf-8'), getenv('HASH').encode('utf-8')):
