@@ -4,6 +4,7 @@ from flask_limiter.util import get_remote_address
 from flask_limiter import Limiter
 from flask_wtf.csrf import CSRFProtect
 from flask_talisman import Talisman
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Other modules
 from markupsafe import escape
@@ -28,6 +29,10 @@ csp = {'default-src': '\'self\'',
 	'script-src': '\'self\'',
 	'style-src': '\'self\'',
 	'form-action': '\'self\''}
+
+app.wsgi_app = ProxyFix(
+        app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+)
 
 talisman = Talisman(app, content_security_policy=csp, force_https = False, frame_options='SAMEORIGIN')
 
