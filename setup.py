@@ -49,4 +49,9 @@ set_key(env_path, 'USERNAME', username)
 set_key(env_path, 'HASH', hashed_str)
 set_key(env_path, 'SECRET_KEY', secret_key)
 
+set_key(env_path, 'PUBLIC_NAME', public_name, quote_mode='never')
+set_key(env_path, 'USERNAME', username, quote_mode='never')
+set_key(env_path, 'HASH', hashed_str, quote_mode='never')
+set_key(env_path, 'SECRET_KEY', secret_key, quote_mode='never')
+
 print('\nDone! Credentials have been written to .env')
