@@ -33,6 +33,12 @@ csp = {'default-src': '\'self\'',
 app.config["SESSION_COOKIE_SECURE"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
+app.config['TRUSTED_HOSTS'] = [
+        'macsblog.tech',
+        '://macsblog.tech',
+        'localhost',
+        ]
+
 
 app.wsgi_app = ProxyFix(
         app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
@@ -112,7 +118,7 @@ def post():
 	newdirectory = Path(directory)
 	newdirectory.mkdir(parents=True, exist_ok=True)
 	with open(f'{directory}/content', 'w') as content:
-		content.write(escape(request.form['content']))
+		content.write(request.form['content'].replace('\n', '<br>'))
 	with open(f'{directory}/created', 'w') as time:
 		time.write(f'{datetime.now().replace(microsecond=0)}')
 	return('Your post has been posted! You can view it <a href="../">Here</a>')
@@ -174,7 +180,7 @@ def postedit(post):
 	old_directory = Path(f'posts/{session["title"]}')
 	del session['title']
 	with open(f'{old_directory}/content', 'w') as file:
-		file.write(request.form['content'])
+		file.write(request.form['content'].replace('\n', '<br>'))
 	old_directory.rename(f'posts/{directory}')
 	with open(f'posts/{directory}/edited', 'w') as file:
 		file.write(f'{datetime.now().replace(microsecond=0)}')
