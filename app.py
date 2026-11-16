@@ -30,6 +30,10 @@ csp = {'default-src': '\'self\'',
 	'style-src': '\'self\'',
 	'form-action': '\'self\''}
 
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+
+
 app.wsgi_app = ProxyFix(
         app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
 )
